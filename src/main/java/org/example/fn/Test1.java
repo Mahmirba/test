@@ -1,12 +1,16 @@
 package org.example.fn;
 
 import java.util.*;
+import java.util.function.IntFunction;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Test1 {
 
     public static void main(String[] args) {
+
+        Test1 test1 = new Test1();
 
 //        Fn1 fn1 = (s1, s2, s3) -> s1.concat(s2).concat(s3);
 //
@@ -53,13 +57,13 @@ public class Test1 {
 //        System.out.println("");
         //********************************
 
-        Stream<Integer> infiniteStream = Stream.iterate(2, i -> i * 2);
-        List<Integer> collect = infiniteStream
-                .skip(2)
-                .limit(5)
-                .collect(Collectors.toList());
-
-        System.out.println("");
+//        Stream<Integer> infiniteStream = Stream.iterate(2, i -> i * 2);
+//        List<Integer> collect = infiniteStream
+//                .skip(2)
+//                .limit(5)
+//                .collect(Collectors.toList());
+//
+//        System.out.println("");
 //        list.stream().parallel().      proccessing list as parallel
 
 //        Test1 test1 = new Test1();
@@ -94,6 +98,11 @@ public class Test1 {
 //
 //        ParentBook parentBook = new ParentBook();
 //        System.out.println(parentBook.getName());
+
+//        test1.testDistinct();
+//        test1.matchOperators();
+//        test1.specialFun();
+        test1.testReductions();
     }
 
     private void myConsumer(MyClass1 myClass1) {
@@ -113,6 +122,68 @@ public class Test1 {
 
     private void myM2(Fn2 fn2) {
         System.out.println(fn2.m1("Dear", "Mah", ""));
+    }
+
+    private void testDistinct(){
+//        List<Integer> intList = Arrays.asList(2, 5, 3, 2, 4, 3);
+//        List<Integer> distinctIntList = intList.stream().distinct().collect(Collectors.toList());
+//
+//        distinctIntList.forEach(s-> System.out.println(s));
+
+        Employee emp1 = new Employee(1, "a", 20);
+        Employee emp2 = new Employee(2, "b", 21);
+        Employee emp3 = new Employee(3, "a", 20);
+        Employee emp4 = new Employee(4, "c", 23);
+        Employee emp5 = new Employee(5, "b", 24);
+
+        List<Employee> list = Arrays.asList(emp1, emp2, emp3,emp4,emp5);
+        List<Employee> empDisList = list.stream().distinct().collect(Collectors.toList());
+
+        empDisList.forEach(s-> System.out.println(s));
+
+
+
+    }
+
+    private void matchOperators(){
+        List<Integer> intList = Arrays.asList(2, 4, 5, 6, 8);
+
+        boolean allEven = intList.stream().allMatch(i -> i % 2 == 0);
+        boolean oneEven = intList.stream().anyMatch(i -> i % 2 == 0);
+        boolean noneMultipleOfThree = intList.stream().noneMatch(i -> i % 3 == 0);
+    }
+
+    private void specialFun(){
+        Employee emp1 = new Employee(1, "a", 20, 100L);
+        Employee emp2 = new Employee(2, "b", 21, 10L);
+        Employee emp3 = new Employee(3, "a", 20, 110L);
+        Employee emp4 = new Employee(4, "c", 23, 500L);
+        Employee emp5 = new Employee(5, "b", 24, 102L);
+
+        List<Employee> empList = Arrays.asList(emp1, emp2, emp3,emp4,emp5);
+        Integer latestEmpId = empList.stream()
+                .mapToInt(this::getInt)
+                .max()
+                .orElseThrow(NoSuchElementException::new);
+
+        System.out.println("=max======: " + latestEmpId);
+    }
+
+
+    private int getInt(Employee s){
+        return 100;
+    }
+    private String getIStr(Employee s){
+        return "100";
+    }
+
+    //interview question*****
+    private void testReductions(){
+
+        IntStream range = IntStream.range(10, 20);
+        int reduce = range.reduce(100, (e, f) -> e + f);
+        System.out.println(reduce);
+
     }
 
 
