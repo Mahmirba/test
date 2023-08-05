@@ -73,6 +73,7 @@ public class Employee {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", age=" + age +
+                ", extra=" + extra +
                 '}';
     }
 }

@@ -1,7 +1,13 @@
 package org.example.fn;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.reflect.Array;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.IntFunction;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -35,7 +41,7 @@ public class Test1 {
         MyClass1 myClass2 = new MyClass1("A1", "B1", "C1", "D1", 70);
         MyClass1 myClass3 = new MyClass1("A2", "B2", "C2", "D2", 20);
         MyClass1 myClass4 = new MyClass1("A3", "B3", "C3", "D3", 200);
-        MyClass1 myClass5 = new MyClass1("A4", "B4", "C4", "D4",250);
+        MyClass1 myClass5 = new MyClass1("A4", "B4", "C4", "D4", 250);
         MyClass1 myClass6 = new MyClass1("A3", "B5", "C5", "D5", 3);
         list.add(myClass1);
         list.add(myClass2);
@@ -102,7 +108,15 @@ public class Test1 {
 //        test1.testDistinct();
 //        test1.matchOperators();
 //        test1.specialFun();
-        test1.testReductions();
+//        test1.testReductions();
+//        test1.collectorJoining();
+//        test1.whenApplySummarizing_thenGetBasicStats();
+//        test1.whenStreamPartition_thenGetMap();
+//        test1.whenStreamGroupBy_thenGetMap();
+//        test1.whenStreamMapping_thenGetMap();
+//        test1.whenStreamGroupingAndReducing_thenGetMap();
+//        test1.parallelTesting();
+        test1.whenStreamToFile_thenGetFile();
     }
 
     private void myConsumer(MyClass1 myClass1) {
@@ -124,7 +138,7 @@ public class Test1 {
         System.out.println(fn2.m1("Dear", "Mah", ""));
     }
 
-    private void testDistinct(){
+    private void testDistinct() {
 //        List<Integer> intList = Arrays.asList(2, 5, 3, 2, 4, 3);
 //        List<Integer> distinctIntList = intList.stream().distinct().collect(Collectors.toList());
 //
@@ -136,16 +150,15 @@ public class Test1 {
         Employee emp4 = new Employee(4, "c", 23);
         Employee emp5 = new Employee(5, "b", 24);
 
-        List<Employee> list = Arrays.asList(emp1, emp2, emp3,emp4,emp5);
+        List<Employee> list = Arrays.asList(emp1, emp2, emp3, emp4, emp5);
         List<Employee> empDisList = list.stream().distinct().collect(Collectors.toList());
 
-        empDisList.forEach(s-> System.out.println(s));
-
+        empDisList.forEach(s -> System.out.println(s));
 
 
     }
 
-    private void matchOperators(){
+    private void matchOperators() {
         List<Integer> intList = Arrays.asList(2, 4, 5, 6, 8);
 
         boolean allEven = intList.stream().allMatch(i -> i % 2 == 0);
@@ -153,14 +166,14 @@ public class Test1 {
         boolean noneMultipleOfThree = intList.stream().noneMatch(i -> i % 3 == 0);
     }
 
-    private void specialFun(){
+    private void specialFun() {
         Employee emp1 = new Employee(1, "a", 20, 100L);
         Employee emp2 = new Employee(2, "b", 21, 10L);
         Employee emp3 = new Employee(3, "a", 20, 110L);
         Employee emp4 = new Employee(4, "c", 23, 500L);
         Employee emp5 = new Employee(5, "b", 24, 102L);
 
-        List<Employee> empList = Arrays.asList(emp1, emp2, emp3,emp4,emp5);
+        List<Employee> empList = Arrays.asList(emp1, emp2, emp3, emp4, emp5);
         Integer latestEmpId = empList.stream()
                 .mapToInt(this::getInt)
                 .max()
@@ -170,20 +183,188 @@ public class Test1 {
     }
 
 
-    private int getInt(Employee s){
+    private int getInt(Employee s) {
         return 100;
     }
-    private String getIStr(Employee s){
+
+    private String getIStr(Employee s) {
         return "100";
     }
 
     //interview question*****
-    private void testReductions(){
+    private void testReductions() {
 
         IntStream range = IntStream.range(10, 20);
         int reduce = range.reduce(100, (e, f) -> e + f);
         System.out.println(reduce);
 
+    }
+
+    private void collectorJoining() {
+
+//        IntStream range = IntStream.range(10, 30);
+//        Stream<Integer> range2= Stream.iterate()
+//        String collect = range.map(s-).collect(Collectors.joining(",")).toString();
+
+        Employee emp1 = new Employee(1, "a", 20, 100L);
+        Employee emp2 = new Employee(2, "b", 21, 10L);
+        Employee emp3 = new Employee(3, "a", 20, 110L);
+        Employee emp4 = new Employee(4, "c", 23, 500L);
+        Employee emp5 = new Employee(5, "b", 24, 102L);
+
+        List<Employee> empList = Arrays.asList(emp1, emp2, emp3, emp4, emp5);
+        String empNames = empList.stream()
+                .map(Employee::getName)
+                .collect(Collectors.joining(", "));
+        System.out.println(empNames);
+
+        Set<Employee> empSet = empList.stream()
+                .collect(Collectors.toSet());
+
+        empSet.forEach(s -> System.out.println(s));
+    }
+
+    public void whenToVectorCollection_thenGetVector() {
+
+        Employee emp1 = new Employee(1, "a", 20, 100L);
+        Employee emp2 = new Employee(2, "b", 21, 10L);
+        Employee emp3 = new Employee(3, "a", 20, 110L);
+        Employee emp4 = new Employee(4, "c", 23, 500L);
+        Employee emp5 = new Employee(5, "b", 24, 102L);
+        List<Employee> empList = Arrays.asList(emp1, emp2, emp3, emp4, emp5);
+
+
+        HashSet empNames = empList.stream()
+                .map(Employee::getName)
+                .collect(Collectors.toCollection(HashSet::new));
+
+    }
+
+    public void whenApplySummarizing_thenGetBasicStats() {
+
+        Employee emp1 = new Employee(1, "a", 20, 100L);
+        Employee emp2 = new Employee(2, "b", 21, 10L);
+        Employee emp3 = new Employee(3, "a", 20, 110L);
+        Employee emp4 = new Employee(4, "c", 23, 500L);
+        Employee emp5 = new Employee(5, "b", 24, 102L);
+        List<Employee> empList = Arrays.asList(emp1, emp2, emp3, emp4, emp5);
+        LongSummaryStatistics stats = empList.stream()
+                .collect(Collectors.summarizingLong(Employee::getAge));
+
+        System.out.println(stats);
+    }
+
+    public void whenStreamPartition_thenGetMap() {
+
+        Employee emp1 = new Employee(1, "a", 20, 100L);
+        Employee emp2 = new Employee(2, "b", 21, 10L);
+        Employee emp3 = new Employee(3, "a", 20, 110L);
+        Employee emp4 = new Employee(4, "c", 23, 500L);
+        Employee emp5 = new Employee(5, "b", 24, 102L);
+        List<Employee> empList = Arrays.asList(emp1, emp2, emp3, emp4, emp5);
+        Map<Boolean, List<Employee>> isLess22 = empList.stream().collect(
+                Collectors.partitioningBy(i -> i.getAge() > 22));
+
+        System.out.println("");
+
+    }
+
+    public void whenStreamGroupBy_thenGetMap() {
+
+        Employee emp1 = new Employee(1, "a", 20, 100L);
+        Employee emp2 = new Employee(2, "b", 21, 10L);
+        Employee emp3 = new Employee(3, "a", 20, 110L);
+        Employee emp4 = new Employee(4, "c", 23, 500L);
+        Employee emp5 = new Employee(5, "b", 24, 102L);
+        List<Employee> empList = Arrays.asList(emp1, emp2, emp3, emp4, emp5);
+        Map<String, List<Employee>> isLess22 = empList.stream().collect(
+                Collectors.groupingBy(i -> i.getName()));
+
+        System.out.println("");
+
+    }
+
+    public void whenStreamMapping_thenGetMap() {
+
+        Test1 test1 = new Test1();
+
+        Employee emp1 = new Employee(1, "a", 20, 100L);
+        Employee emp2 = new Employee(2, "b", 21, 10L);
+        Employee emp3 = new Employee(3, "a", 20, 110L);
+        Employee emp4 = new Employee(4, "c", 23, 500L);
+        Employee emp5 = new Employee(5, "b", 24, 102L);
+        List<Employee> empList = Arrays.asList(emp1, emp2, emp3, emp4, emp5);
+        Map<String, List<Integer>> isLess22 = empList.stream().collect(
+                Collectors.groupingBy(i -> i.getName(), Collectors.mapping(test1::getMyData, Collectors.toList())));
+
+        System.out.println("");
+    }
+
+    public void whenStreamGroupingAndReducing_thenGetMap() {
+
+        Test1 test1 = new Test1();
+
+        Employee emp1 = new Employee(1, "a", 20, 100L);
+        Employee emp2 = new Employee(2, "b", 21, 10L);
+        Employee emp3 = new Employee(3, "a", 20, 110L);
+        Employee emp4 = new Employee(4, "c", 23, 500L);
+        Employee emp5 = new Employee(5, "b", 24, 102L);
+        List<Employee> empList = Arrays.asList(emp1, emp2, emp3, emp4, emp5);
+        Double incrementalSalary = empList.stream().collect(Collectors.reducing(0.0, e -> Double.valueOf(e.getExtra()) * 0.3, (e1, e2) -> e1 + e2));
+
+        System.out.println(incrementalSalary);
+    }
+
+    public void parallelTesting() {
+
+        IntStream range = IntStream.range(10, 1000);
+
+        range.parallel().forEach(System.out::println);
+    }
+
+    public void whenStreamToFile_thenGetFile()  {
+        String[] words = {
+                "hello",
+                "refer",
+                "world",
+                "level",
+                "level2",
+                "level3",
+                "level4"
+        };
+
+        try (PrintWriter pw = new PrintWriter(
+                Files.newBufferedWriter(Paths.get("C:\\temp\\test.txt")))) {
+            Stream.of(words).forEach(
+                    s -> {
+                        pw.println(s);
+                        pw.flush();
+                    });
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void printData(String s){
+//        so
+    }
+
+
+    private Integer getMyData(Employee employee) {
+        return 150;
+    }
+
+    private void checkFinally() {
+
+        try {
+            System.out.println("in main block");
+            return;
+        } catch (Exception e) {
+            System.out.println("in catch");
+            return;
+        } finally {
+            System.out.println("in finally");
+        }
     }
 
 
